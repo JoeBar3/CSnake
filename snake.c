@@ -1,11 +1,7 @@
 #include <SDL2/SDL.h>
+#include "snake.h"
 #include <stdio.h>
 #define GridSize 20
-
-SDL_Rect** alloc_grid(void);
-void free_grid(SDL_Rect** grid);
-void initialise_rect(SDL_Rect** grid, int squareSize, int hPadding, int vPadding);
-int calc_screen_size(SDL_Window* window, int* hPadding, int* vPadding);
 
 int main(int argc, char *argv[]) {
     //Setting up SDL
