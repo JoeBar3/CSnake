@@ -1,6 +1,8 @@
 #include <SDL2/SDL.h>
 #include "snake.h"
 #include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
 #define GridSize 20
 
 int main(int argc, char *argv[]) {
@@ -36,11 +38,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    SDL_SetRenderDrawColor(renderer, 0, 128, 255, 255);
-    SDL_RenderClear(renderer);
-
     //Drawing the grid
-    SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
     int hPadding = 0;
     int vPadding = 0;
     int squareSize = calc_screen_size(window, &hPadding, &vPadding);
@@ -52,20 +50,19 @@ int main(int argc, char *argv[]) {
     }
     initialise_rect(grid, squareSize, hPadding, vPadding);
 
-    for (int i = 0; i < GridSize; i++){
-        for (int j = 0; j < GridSize; j++){
-            SDL_RenderFillRect(renderer, &grid[i][j]);
-        }
-    }
-    SDL_RenderPresent(renderer);
-
     Snake snake;
     int failure;
     failure = initialise_snake(&snake);
     if (failure){
         return 1;
     }
+    for (int i = 0; i < snake.length; i++){
+        printf("Snake position index: %d, x: %d, y: %d.", i, snake.positions[i].x, snake.positions[i].y);
+    }
 
+    Coords apple = {9,9};
+
+    draw_grid(renderer, grid, &snake, &apple);
     SDL_Event e;
     int quit = 0;
     while (!quit) {
@@ -74,6 +71,7 @@ int main(int argc, char *argv[]) {
                 quit = 1;
             }
         }
+        draw_grid(renderer, grid, &snake, &apple);
     }
 
     //Free snake call should be whenever game over logic occurs, which I think will be here.
@@ -164,14 +162,11 @@ int initialise_snake(Snake* snake){
     /*
     Going to start the Snake in the top left corner, with the head at (2,0)
     */
-    snake->head.x = 2;
-    snake->head.y = 0;
+    snake->head.x = 0;
+    snake->head.y = 2;
     // Tail is at (0,0)
     snake->tail.x = 0;
     snake->tail.y = 0;
-    /*
-    I'm going to organise the positions by row and then column so that I can just iterate through the array once and change the colour when I encounter a value in the positions array.
-    */
     // Setting the initial positions.
     snake->positions[0].x = 0;
     snake->positions[0].y = 0;
@@ -188,4 +183,42 @@ void free_snake(Snake* snake){
         free(snake->positions);
         snake->positions = NULL;
     }
+}
+
+void draw_grid(SDL_Renderer* renderer, SDL_Rect** grid, Snake* snake, Coords* apple){
+    int isApple = 0;
+    int isSnake = 0;
+    SDL_SetRenderDrawColor(renderer, 0, 128, 255, 255);
+    SDL_RenderClear(renderer);
+    for (int i = 0; i < GridSize; i++){
+        for (int j = 0; j < GridSize; j++){
+            isApple = 0;
+            isSnake = 0;
+            // Should be guaranteed that the apple and snake don't overlap.
+            if (i == apple->x && j == apple->y){
+                isApple = 1;
+            }
+            for (int k = 0; k < snake->length; k++){
+                if (i == snake->positions[k].x && j == snake->positions[k].y){
+                    isSnake = 1;
+                    break;
+                }
+            }
+            if (isApple){
+                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            }
+            else if (isSnake)
+            {
+                SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+            } else{
+                SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
+            }
+            SDL_RenderFillRect(renderer, &grid[i][j]);
+        }
+    }
+    SDL_RenderPresent(renderer);
+}
+
+int move_snake(SDL_Rect** grid, Snake* snake, Coords* apple){
+    return 0;
 }

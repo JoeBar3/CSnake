@@ -64,3 +64,15 @@ int initialise_snake(Snake* snake);
 A function to free an existing Snake struct.
 */
 void free_snake(Snake* snake);
+
+/*
+A function to draw the updated version of the game grid.
+*/
+void draw_grid(SDL_Renderer* renderer, SDL_Rect** grid, Snake* snake, Coords* apple);
+
+/*
+A function to update the game state for every turn.
+Returns 0 on success and 1 on failure.
+Failure will only occur if reallocating space for the positions array fails.
+*/
+int move_snake(SDL_Rect** grid, Snake* snake, Coords* apple);
