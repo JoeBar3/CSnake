@@ -59,6 +59,13 @@ int main(int argc, char *argv[]) {
     }
     SDL_RenderPresent(renderer);
 
+    Snake snake;
+    int failure;
+    failure = initialise_snake(&snake);
+    if (failure){
+        return 1;
+    }
+
     SDL_Event e;
     int quit = 0;
     while (!quit) {
@@ -68,6 +75,9 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+
+    //Free snake call should be whenever game over logic occurs, which I think will be here.
+    free_snake(&snake);
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -138,4 +148,44 @@ int calc_screen_size(SDL_Window* window, int* hPadding, int* vPadding){
     *vPadding = paddingHeight;
 
     return squareSize;
+}
+
+int initialise_snake(Snake* snake){
+    //Positions array starts at 10 length, as most games will likely end well before the player reaches 10 length of the snake.
+    snake->positionsLength = 10;
+    snake->positions = malloc(snake->positionsLength * sizeof(Coords));
+    if (snake->positions == NULL){
+        printf("Unable to allocate the Snake positions array.\n");
+        return 1;
+    }
+    //Starting length of 3 for the Snake.
+    snake->length = 3;
+    snake->direction = LEFT;
+    /*
+    Going to start the Snake in the top left corner, with the head at (2,0)
+    */
+    snake->head.x = 2;
+    snake->head.y = 0;
+    // Tail is at (0,0)
+    snake->tail.x = 0;
+    snake->tail.y = 0;
+    /*
+    I'm going to organise the positions by row and then column so that I can just iterate through the array once and change the colour when I encounter a value in the positions array.
+    */
+    // Setting the initial positions.
+    snake->positions[0].x = 0;
+    snake->positions[0].y = 0;
+    snake->positions[1].x = 1;
+    snake->positions[1].y = 0;
+    snake->positions[2].x = 2;
+    snake->positions[2].y = 0;
+    // IMPORTANT, I'm using snake.length to track initialised (and valid) values of the positions. snake.positionsLength is how many indexes we can actually use.
+    return 0;
+}
+
+void free_snake(Snake* snake){
+    if (snake->positions != NULL){
+        free(snake->positions);
+        snake->positions = NULL;
+    }
 }

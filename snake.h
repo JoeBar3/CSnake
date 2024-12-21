@@ -26,7 +26,10 @@ Struct representing the Snake, encapsulating all of its required data.
 typedef struct{
     Coords* positions; // Pointer to array of coordinates that the Snake occupies.
     int length; // Fixed integer value representing the length of the Snake. This is not guaranteed to be the same as the length of the positions array.
+    int positionsLength; // Actual length of the positions array.
     Direction direction; // Enum value representing up, left, right and down.
+    Coords head; // The head of the Snake.
+    Coords tail; // The tail of the Snake.
 } Snake;
 
 /*
@@ -50,3 +53,14 @@ A function that calculates the available screen size.
 Returns the square size and modifies the hPadding and vPadding, which are passed by reference.
 */
 int calc_screen_size(SDL_Window* window, int* hPadding, int* vPadding);
+
+/*
+A function to initialise a newly created Snake struct.
+Returns 0 on success, 1 on failure to allocate the position array.
+*/
+int initialise_snake(Snake* snake);
+
+/*
+A function to free an existing Snake struct.
+*/
+void free_snake(Snake* snake);
