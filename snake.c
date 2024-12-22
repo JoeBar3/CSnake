@@ -56,11 +56,11 @@ int main(int argc, char *argv[]) {
     if (failure){
         return 1;
     }
-    for (int i = 0; i < snake.length; i++){
-        printf("Snake position index: %d, x: %d, y: %d.", i, snake.positions[i].x, snake.positions[i].y);
-    }
 
     Coords apple = {9,9};
+
+    //Seeding the random number generator.
+    srand(time(NULL));
 
     draw_grid(renderer, grid, &snake, &apple);
     SDL_Event e;
@@ -72,6 +72,7 @@ int main(int argc, char *argv[]) {
             }
         }
         draw_grid(renderer, grid, &snake, &apple);
+        SDL_Delay(16);
     }
 
     //Free snake call should be whenever game over logic occurs, which I think will be here.
@@ -220,5 +221,30 @@ void draw_grid(SDL_Renderer* renderer, SDL_Rect** grid, Snake* snake, Coords* ap
 }
 
 int move_snake(SDL_Rect** grid, Snake* snake, Coords* apple){
+    //Checking the direction and that its in bounds.
+    if (snake->direction == UP && snake->head.y > 0){
+        Coords newHead = {snake->head.x, snake->head.y - 1};
+        if (newHead.x == apple->x && newHead.y == apple->y){
+            
+            gen_new_apple(apple, snake);
+        }
+    }else if (snake->direction == LEFT && snake->head.x > 0){
+        
+    }else if (snake->direction == RIGHT && snake->head.x < 7){
+
+    }else if (snake->direction == DOWN && snake->head.y < 7){
+
+    }else{
+        // Movement is out of bounds so game over.
+        return 1;
+    }
+    return 0;
+}
+
+void gen_new_apple(Coords* apple, Snake* snake){
+
+}
+
+int insert_position(Snake* snake, Coords* value){
     return 0;
 }

@@ -73,6 +73,17 @@ void draw_grid(SDL_Renderer* renderer, SDL_Rect** grid, Snake* snake, Coords* ap
 /*
 A function to update the game state for every turn.
 Returns 0 on success and 1 on failure.
-Failure will only occur if reallocating space for the positions array fails.
+Failure usually indicates an illegal move and therefore game over, but in rare cases it can also indicate a failure to allocate enough memory for the positions grid.
 */
 int move_snake(SDL_Rect** grid, Snake* snake, Coords* apple);
+
+/*
+A function to randomly generate a new available position on the board for the apple to spawn.
+*/
+void gen_new_apple(Coords* apple, Snake* snake);
+
+/*
+A function to add a new value to the positions array.
+Returns 0 on success and 1 on failure.
+*/
+int insert_position(Snake* snake, Coords* value);
