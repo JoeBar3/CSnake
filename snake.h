@@ -87,3 +87,8 @@ A function to add a new value to the positions array.
 Returns 0 on success and 1 on failure.
 */
 int insert_position(Snake* snake, Coords* value);
+
+/*
+A function to update the values in the position array as well as the tail and head attributes of a snake struct.
+*/
+void update_position(Snake* snake, Coords* value);

@@ -4,8 +4,9 @@
 #include <time.h>
 #include <stdlib.h>
 #define GridSize 20
+#define keyVal e.key.keysym.sym
 
-int main(int argc, char *argv[]) {
+int main(void) {
     //Setting up SDL
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         printf("SDL_Init Error: %s\n", SDL_GetError());
@@ -65,12 +66,28 @@ int main(int argc, char *argv[]) {
     draw_grid(renderer, grid, &snake, &apple);
     SDL_Event e;
     int quit = 0;
-    while (!quit) {
+    int gameOver = 0;
+    while (!quit && !gameOver) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
                 quit = 1;
             }
+            if (e.type == SDL_KEYDOWN){
+                if ((keyVal == SDLK_w || keyVal == SDLK_UP) && snake.direction != DOWN){
+                    snake.direction = UP;
+                }
+                if ((keyVal == SDLK_a || keyVal == SDLK_LEFT) && snake.direction != RIGHT){
+                    snake.direction = LEFT;
+                }
+                if ((keyVal == SDLK_s || keyVal == SDLK_DOWN) && snake.direction != UP){
+                    snake.direction = DOWN;
+                }
+                if ((keyVal == SDLK_d || keyVal == SDLK_RIGHT) && snake.direction != LEFT){
+                    snake.direction = RIGHT;
+                }
+            }
         }
+        //Call move snake first, check return value to determine game over.
         draw_grid(renderer, grid, &snake, &apple);
         SDL_Delay(16);
     }
@@ -246,5 +263,26 @@ void gen_new_apple(Coords* apple, Snake* snake){
 }
 
 int insert_position(Snake* snake, Coords* value){
+    // If we have space, then we can just assing it to a new value and increment.
+    if (snake->length < snake->positionsLength){
+        snake->positions[snake->length] = *value;
+        snake->length++;
+        snake->head = *value;
+    }else{
+        //If the allocation fails, we return 1 which will be used to end the gameloop, and therefore we don't need to free the positions pointer here on failure.
+        snake->positionsLength += 10;
+        Coords* newPositions = realloc(snake->positions, snake->positionsLength);
+        if (newPositions == NULL){
+            return 1;
+        }
+        snake->positions = newPositions;
+        snake->positions[snake->length] = *value;
+        snake->length++;
+        snake->head = *value;
+    }
     return 0;
+}
+
+void update_position(Snake* snake, Coords* value){
+
 }
