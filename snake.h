@@ -75,7 +75,7 @@ A function to update the game state for every turn.
 Returns 0 on success and 1 on failure.
 Failure usually indicates an illegal move and therefore game over, but in rare cases it can also indicate a failure to allocate enough memory for the positions grid.
 */
-int move_snake(SDL_Rect** grid, Snake* snake, Coords* apple);
+int move_snake(Snake* snake, Coords* apple);
 
 /*
 A function to randomly generate a new available position on the board for the apple to spawn.
@@ -92,3 +92,9 @@ int insert_position(Snake* snake, Coords* value);
 A function to update the values in the position array as well as the tail and head attributes of a snake struct.
 */
 void update_position(Snake* snake, Coords* value);
+
+/*
+A function to see if the value provided collides with any other part of the snake.
+Returns 0 for no collision, and 1 for a collision.
+*/
+int check_collision(Snake* snake, Coords* value);

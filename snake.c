@@ -31,6 +31,8 @@ int main(void) {
         return 1;
     }
 
+    SDL_SetWindowAlwaysOnTop(window, SDL_TRUE);
+
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL) {
         printf("SDL_CreateRenderer Error: %s\n", SDL_GetError());
@@ -66,8 +68,7 @@ int main(void) {
     draw_grid(renderer, grid, &snake, &apple);
     SDL_Event e;
     int quit = 0;
-    int gameOver = 0;
-    while (!quit && !gameOver) {
+    while (!quit) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
                 quit = 1;
@@ -88,8 +89,13 @@ int main(void) {
             }
         }
         //Call move snake first, check return value to determine game over.
+        int gameOver;
+        gameOver = move_snake(&snake, &apple);
+        if (gameOver){
+            break;
+        }
         draw_grid(renderer, grid, &snake, &apple);
-        SDL_Delay(16);
+        SDL_Delay(125);
     }
 
     //Free snake call should be whenever game over logic occurs, which I think will be here.
@@ -176,7 +182,7 @@ int initialise_snake(Snake* snake){
     }
     //Starting length of 3 for the Snake.
     snake->length = 3;
-    snake->direction = LEFT;
+    snake->direction = RIGHT;
     /*
     Going to start the Snake in the top left corner, with the head at (2,0)
     */
@@ -237,29 +243,57 @@ void draw_grid(SDL_Renderer* renderer, SDL_Rect** grid, Snake* snake, Coords* ap
     SDL_RenderPresent(renderer);
 }
 
-int move_snake(SDL_Rect** grid, Snake* snake, Coords* apple){
+int move_snake(Snake* snake, Coords* apple){
     //Checking the direction and that its in bounds.
+    Coords newHead;
     if (snake->direction == UP && snake->head.y > 0){
-        Coords newHead = {snake->head.x, snake->head.y - 1};
-        if (newHead.x == apple->x && newHead.y == apple->y){
-            
-            gen_new_apple(apple, snake);
-        }
+        newHead.x = snake->head.x;
+        newHead.y = snake->head.y - 1;
     }else if (snake->direction == LEFT && snake->head.x > 0){
-        
-    }else if (snake->direction == RIGHT && snake->head.x < 7){
-
-    }else if (snake->direction == DOWN && snake->head.y < 7){
-
+        newHead.x = snake->head.x - 1;
+        newHead.y = snake->head.y;
+    }else if (snake->direction == RIGHT && snake->head.x < GridSize - 1){
+        newHead.x = snake->head.x + 1;
+        newHead.y = snake->head.y;
+    }else if (snake->direction == DOWN && snake->head.y < GridSize - 1){
+        newHead.x = snake->head.x;
+        newHead.y = snake->head.y + 1;
     }else{
         // Movement is out of bounds so game over.
         return 1;
+    }
+    // Check for apple and check for collision with self.
+    int collision = check_collision(snake, &newHead);
+    if (collision){
+        return 1;
+    }
+    if (newHead.x == apple->x && newHead.y == apple->y){
+        int fail = 0;
+        fail = insert_position(snake, &newHead);
+        if (fail){
+            // Unable to allocate enough memory.
+            return 1;
+        }
+        gen_new_apple(apple, snake);
+    }else{
+        update_position(snake, &newHead);
     }
     return 0;
 }
 
 void gen_new_apple(Coords* apple, Snake* snake){
-
+    int collision = 1;
+    int col = -1;
+    int row = -1;
+    while (collision){
+        int randNum = rand() % 400;
+        col = randNum % 20;
+        row = randNum / 20;
+        Coords newApple = {col, row};
+        collision = check_collision(snake, &newApple);
+    }
+    apple->x = col;
+    apple->y = row;
 }
 
 int insert_position(Snake* snake, Coords* value){
@@ -284,5 +318,19 @@ int insert_position(Snake* snake, Coords* value){
 }
 
 void update_position(Snake* snake, Coords* value){
+    for (int i = 0; i < snake->length - 1; i++){
+        snake->positions[i] = snake->positions[i+1];
+    }
+    snake->positions[snake->length - 1] = *value;
+    snake->tail = snake->positions[0];
+    snake->head = *value;
+}
 
+int check_collision(Snake* snake, Coords* value){
+    for (int i = 0; i < snake->length; i++){
+        if (snake->positions[i].x == value->x && snake->positions[i].y == value->y){
+            return 1;
+        }
+    }
+    return 0;
 }
