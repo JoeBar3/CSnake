@@ -186,8 +186,8 @@ int initialise_snake(Snake* snake){
     /*
     Going to start the Snake in the top left corner, with the head at (2,0)
     */
-    snake->head.x = 0;
-    snake->head.y = 2;
+    snake->head.x = 2;
+    snake->head.y = 0;
     // Tail is at (0,0)
     snake->tail.x = 0;
     snake->tail.y = 0;
@@ -305,7 +305,7 @@ int insert_position(Snake* snake, Coords* value){
     }else{
         //If the allocation fails, we return 1 which will be used to end the gameloop, and therefore we don't need to free the positions pointer here on failure.
         snake->positionsLength += 10;
-        Coords* newPositions = realloc(snake->positions, snake->positionsLength);
+        Coords* newPositions = realloc(snake->positions, snake->positionsLength * sizeof(Coords));
         if (newPositions == NULL){
             return 1;
         }
