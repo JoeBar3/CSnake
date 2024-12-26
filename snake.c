@@ -68,6 +68,17 @@ int main(void) {
     draw_grid(renderer, grid, &snake, &apple);
     SDL_Event e;
     int quit = 0;
+    int start = 0;
+    while (!quit && !start){
+        while(SDL_PollEvent(&e)){
+            if (e.type == SDL_QUIT){
+                quit = 1;
+            }
+            if (e.type == SDL_KEYDOWN){
+                start = 1;
+            }
+        }
+    }
     while (!quit) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
